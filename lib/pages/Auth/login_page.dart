@@ -161,7 +161,10 @@ class _LoginPageState extends State<LoginPage> {
                                 );
                             if (listUser.isNotEmpty) {
                               int userId = listUser[0]['id'];
-                              String? role = listUser[0]['role'] ?? listUser[0]['user_role'] ?? listUser[0]['userRole'];
+                              String? role =
+                                  listUser[0]['role'] ??
+                                  listUser[0]['user_role'] ??
+                                  listUser[0]['userRole'];
                               bool isSaved = await LocalStr.saveUserStorage(
                                 valStr: userId.toString(),
                               );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:online_pos/Repository/api_repo.dart';
 
 class SalePage extends StatefulWidget {
   SalePage({super.key});
@@ -10,101 +11,52 @@ class SalePage extends StatefulWidget {
 class _SalePageState extends State<SalePage> {
   int selectedCategoryIndex = 0;
 
+  void getAllProduct({required int categoryId}) async {
+    ApiRepo.getProduct(categoryId: categoryId).then((value) {
+      allProducts = value;
+      setState(() {});
+    });
+  }
+
+  // category
+  void getCategory() async {
+    ApiRepo.getCategory().then((value) {
+      allCategory = value;
+      setState(() {});
+    });
+  }
+
   // Sample categories
-  final List<String> categories = [
-    'All',
-    'Electronics',
-    'Clothing',
-    'Food',
-    'Books',
-    'Home',
-    'Sports',
-  ];
+  // final List<String> categories = [
+  //   'All',
+  //   'Electronics',
+  //   'Clothing',
+  //   'Food',
+  //   'Books',
+  //   'Home',
+  //   'Sports',
+  // ];
 
   // Sample products
-  final List<Map<String, dynamic>> allProducts = [
-    {
-      'id': 1,
-      'name': 'Wireless Headphones',
-      'price': 49.99,
-      'category': 'Electronics',
-      'quantity': 0,
-      'image': Icons.headphones,
-    },
-    {
-      'id': 2,
-      'name': 'Smart Watch',
-      'price': 199.99,
-      'category': 'Electronics',
-      'quantity': 0,
-      'image': Icons.watch,
-    },
-    {
-      'id': 3,
-      'name': 'T-Shirt',
-      'price': 19.99,
-      'category': 'Clothing',
-      'quantity': 0,
-      'image': Icons.shopping_bag,
-    },
-    {
-      'id': 4,
-      'name': 'Jeans',
-      'price': 59.99,
-      'category': 'Clothing',
-      'quantity': 0,
-      'image': Icons.shopping_bag,
-    },
-    {
-      'id': 5,
-      'name': 'Coffee Maker',
-      'price': 89.99,
-      'category': 'Home',
-      'quantity': 0,
-      'image': Icons.kitchen,
-    },
-    {
-      'id': 6,
-      'name': 'Yoga Mat',
-      'price': 29.99,
-      'category': 'Sports',
-      'quantity': 0,
-      'image': Icons.fitness_center,
-    },
-    {
-      'id': 7,
-      'name': 'Python Book',
-      'price': 39.99,
-      'category': 'Books',
-      'quantity': 0,
-      'image': Icons.book,
-    },
-    {
-      'id': 8,
-      'name': 'Rice',
-      'price': 12.99,
-      'category': 'Food',
-      'quantity': 0,
-      'image': Icons.restaurant,
-    },
-  ];
-
-  late List<Map<String, dynamic>> products;
+  List<Map<String, dynamic>> allProducts = [];
+  // sample category
+  List<Map<String, dynamic>> allCategory = [];
 
   @override
   void initState() {
     super.initState();
-    products = List.from(allProducts);
+    getCategory();
+    getAllProduct(categoryId: 1);
   }
-
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
         elevation: 0,
+        foregroundColor: Colors.white,
         backgroundColor: Color(0xFF667eea),
         title: Text(
           'Products',
@@ -154,42 +106,45 @@ class _SalePageState extends State<SalePage> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: List.generate(
-                  categories.length,
+                  allCategory.length,
                   (index) => Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: selectedCategoryIndex == index
-                            ? Color(0xFF667eea)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: selectedCategoryIndex == index
-                            ? null
-                            : Border.all(
-                                color: Color(0xFF667eea).withOpacity(0.3),
-                              ),
-                        boxShadow: selectedCategoryIndex == index
-                            ? [
-                                BoxShadow(
-                                  color: Color(0xFF667eea).withOpacity(0.3),
-                                  blurRadius: 8,
-                                  offset: Offset(0, 2),
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: Text(
-                        categories[index],
-                        style: TextStyle(
-                          color: selectedCategoryIndex == index
-                              ? Colors.white
-                              : Color(0xFF667eea),
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
+                    child: GestureDetector(
+                      onTap: () {
+                        for(var item in allCategory){
+                          item['is_selected'] = 0;
+                        }
+                        allCategory[index]['is_selected'] = 1;
+                        int categoryId = allCategory[index]['id'];
+                         getAllProduct(categoryId: categoryId);
+                        setState(() {
+                          
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: allCategory[index]['is_selected'] == 1
+                              ? Color(0xFF667eea)
+                              : Colors.white,
+                      
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Color(0xFF667eea).withOpacity(0.3),
+                          ),
+                        ),
+                        child: Text(
+                          allCategory[index]['name'] ?? '',
+                          style: TextStyle(
+                            color: allCategory[index]['is_selected'] == 1
+                                ? Colors.white
+                                : Color(0xFF667eea),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
                     ),
@@ -202,9 +157,9 @@ class _SalePageState extends State<SalePage> {
           Expanded(
             child: ListView.builder(
               padding: EdgeInsets.all(16),
-              itemCount: products.length,
+              itemCount: allProducts.length,
               itemBuilder: (context, index) {
-                final product = products[index];
+                final product = allProducts[index];
                 return GestureDetector(
                   onTap: () {
                     // Navigate to product details if needed
@@ -234,15 +189,13 @@ class _SalePageState extends State<SalePage> {
                               gradient: LinearGradient(
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xFF667eea),
-                                  Color(0xFF764ba2),
-                                ],
+                                colors: [Color(0xFF667eea), Color(0xFF764ba2)],
                               ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
-                              product['image'],
+                              // product['image'],
+                              Icons.headphones, // Placeholder icon for now
                               size: 50,
                               color: Colors.white,
                             ),
@@ -256,7 +209,7 @@ class _SalePageState extends State<SalePage> {
                               children: [
                                 // Product Name
                                 Text(
-                                  product['name'],
+                                  product['name'] ?? 'Product Name',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -275,7 +228,7 @@ class _SalePageState extends State<SalePage> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    product['category'],
+                                    product['category'] ?? '',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: Color(0xFF667eea),
@@ -286,8 +239,9 @@ class _SalePageState extends State<SalePage> {
                                 SizedBox(height: 8),
                                 // Price
                                 Text(
-                                  '\$${product['price'].toStringAsFixed(2)}',
-                                  style: TextStyle(
+                                  '${product['currency'] ?? '\$'}'
+                                  '${(double.tryParse(product['price']?.toString() ?? '0') ?? 0.0).toStringAsFixed(2)}',
+                                  style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xFF667eea),

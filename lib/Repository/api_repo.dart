@@ -6,6 +6,42 @@ class ApiRepo {
   static String Url =
       "http://192.168.168.1:8000/"; // static mean we can call this variable without create object of this class
 
+  // Get all category
+  static Future<List<Map<String, dynamic>>> getCategory() async {
+    var respone = await http.post(
+      Uri.parse("${Url}api/get-category"),
+
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+    );
+
+    List<Map<String, dynamic>> listResponse = [];
+    listResponse = List<Map<String, dynamic>>.from(
+      jsonDecode(respone.body)['data'],
+    );
+    return listResponse;
+  }
+
+  // Get all product
+  static Future<List<Map<String, dynamic>>> getProduct({required int categoryId}) async {
+    var respone = await http.post(
+      Uri.parse("${Url}api/get-all-products"),
+      body: jsonEncode({'category_id' : categoryId}),
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+    );
+
+    List<Map<String, dynamic>> listResponse = [];
+    listResponse = List<Map<String, dynamic>>.from(
+      jsonDecode(respone.body)['data'],
+    );
+    return listResponse;
+  }
+
   static Future<List<Map<String, dynamic>>> getUserInfo({
     required int userId,
   }) async {
@@ -24,9 +60,7 @@ class ApiRepo {
         return [];
       }
       List<Map<String, dynamic>> listResponse = [];
-      listResponse = List<Map<String, dynamic>>.from(
-        decoded['data'],
-      );
+      listResponse = List<Map<String, dynamic>>.from(decoded['data']);
       return listResponse;
     } catch (e) {
       return [];
@@ -52,9 +86,7 @@ class ApiRepo {
         return [];
       }
       List<Map<String, dynamic>> listResponse = [];
-      listResponse = List<Map<String, dynamic>>.from(
-        decoded['data'],
-      );
+      listResponse = List<Map<String, dynamic>>.from(decoded['data']);
       return listResponse;
     } catch (e) {
       return [];

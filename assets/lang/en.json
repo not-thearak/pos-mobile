@@ -1,5 +1,10 @@
 {
     "home_page" : "Home Page",
     "page": "Page",
-    "home" : "Home"
+    "home" : "Home",
+    "Sale" : "Sale",
+    "Report" : "Report",
+    "Stock" : "Stock",
+    "Add Product" : "Add Product",
+    "available_modules" : "Available Modules"
 }

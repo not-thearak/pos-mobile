@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:online_pos/Elements/icon_tab_element.dart';
 import 'package:online_pos/Helper/helper.dart';
 import 'package:online_pos/Pages/Auth/login_page.dart';
 import 'package:online_pos/Pages/Sale/sale_page.dart';
@@ -7,7 +10,7 @@ import 'package:online_pos/Storage/local_str.dart';
 
 // ignore: must_be_immutable
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -15,15 +18,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Map<String, dynamic> userInfo = {
-    // "name": "Thearak",
+    // "name": "Vichet",
     // "phone": "09878776",
     // "role": "admin",
   };
 
   List<Map<String, dynamic>> listModule = [];
-  bool isLoading = true;
-  String? errorMessage;
-
   final List<Color> moduleColors = [
     Color(0xFF667eea),
     Color(0xFF764ba2),
@@ -46,77 +46,27 @@ class _HomePageState extends State<HomePage> {
     Icons.support_agent,
   ];
 
-  Future<void> getModule() async {
-    String? role = userInfo['role'] ?? userInfo['user_role'] ?? userInfo['userRole'] ?? userInfo['role_id']?.toString();
-    if (role == null) {
-      setState(() {
-        errorMessage = "User role not found.";
-      });
-      return;
-    }
-
-    setState(() {
-      isLoading = true;
-      errorMessage = null;
-    });
-
-    try {
-      listModule = await ApiRepo.getModule(role: role);
-      if (listModule.isEmpty) {
-        errorMessage = "No modules available for this role.";
-      }
-    } catch (e) {
-      errorMessage = "Failed to load modules. Please check your connection.";
-      listModule = [];
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
+  void getModule() async {
+    listModule = await ApiRepo.getModule(role: 'admin');
+    // listModule = await ApiRepo.getModule(role: userInfo['role']);
+    setState(() {});
   }
 
-  Future<void> getUserId() async {
-    try {
-      String? userId = await LocalStr.getUserStorage();
-      if (userId == null) {
-        setState(() {
-          errorMessage = "User not logged in.";
-          isLoading = false;
-        });
-        return;
-      }
-
-      String? savedRole = await LocalStr.getUserRole();
-
-      final value = await ApiRepo.getUserInfo(userId: int.parse(userId));
-      if (value.isNotEmpty) {
+  void getUserId() {
+    LocalStr.getUserStorage().then((userId) {
+      // print("User ID: $value");
+      ApiRepo.getUserInfo(userId: int.parse(userId!)).then((value) {
         userInfo = value[0];
-        Object? apiRole = userInfo['role'] ?? userInfo['user_role'] ?? userInfo['userRole'] ?? userInfo['role_id'];
-        if (apiRole != null) {
-          userInfo['role'] = apiRole.toString();
-          await LocalStr.saveUserRole(role: apiRole.toString());
-        } else if (savedRole != null) {
-          userInfo['role'] = savedRole;
-        }
-        await getModule();
-      } else {
-        setState(() {
-          errorMessage = "Failed to load user info.";
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        errorMessage = "Failed to load user info. Please check your connection.";
-        isLoading = false;
+        setState(() {});
       });
-    }
+    });
   }
 
   @override
   void initState() {
-    super.initState();
     getUserId();
+    getModule();
+    super.initState();
   }
 
   @override
@@ -190,18 +140,15 @@ class _HomePageState extends State<HomePage> {
                         width: 70,
                         height: 70,
                         decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage("assets/images/user.jpg"),
-                          ),
                           shape: BoxShape.circle,
-                          // color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withOpacity(0.2),
                           border: Border.all(color: Colors.white, width: 2),
                         ),
-                        // child: Icon(
-                        //   Icons.person,
-                        //   size: 40,
-                        //   color: Colors.white,
-                        // ),
+                        child: Icon(
+                          Icons.person,
+                          size: 40,
+                          color: Colors.white,
+                        ),
                       ),
                       SizedBox(width: 16),
                       Expanded(
@@ -218,7 +165,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             SizedBox(height: 4),
                             Text(
-                              userInfo['email'] ?? "",
+                              userInfo['email'] ?? "N/A",
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.9),
                                 fontSize: 14,
@@ -235,7 +182,7 @@ class _HomePageState extends State<HomePage> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
-                                userInfo['role']?.toUpperCase() ?? "USER",
+                                userInfo['role_id']?.toString().toUpperCase() ?? "Admin",
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
@@ -257,7 +204,8 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Available Modules",
+                      Helper.tranSalate(key: "available_modules"),
+                      // "Available Modules",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -265,63 +213,14 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     SizedBox(height: 16),
-                    if (isLoading)
-                      Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: CircularProgressIndicator(),
-                        ),
-                      )
-                    else if (errorMessage != null)
-                      Padding(
-                        padding: EdgeInsets.all(32),
-                        child: Column(
-                          children: [
-                            Text(
-                              errorMessage!,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.red[700],
-                              ),
-                              textAlign: TextAlign.center,
+                    listModule.isEmpty
+                        ? Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(32),
+                              child: CircularProgressIndicator(),
                             ),
-                            SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: getModule,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF667eea),
-                              ),
-                              child: Text("Retry"),
-                            ),
-                          ],
-                        ),
-                      )
-                    else if (listModule.isEmpty)
-                      Padding(
-                        padding: EdgeInsets.all(32),
-                        child: Column(
-                          children: [
-                            Text(
-                              "No modules available.",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey[700],
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: getModule,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF667eea),
-                              ),
-                              child: Text("Retry"),
-                            ),
-                          ],
-                        ),
-                      )
-                    else
-                      GridView.builder(
+                          )
+                        : GridView.builder(
                             physics: NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             itemCount: listModule.length,
@@ -398,8 +297,10 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           SizedBox(height: 12),
                                           Text(
-                                            listModule[index]['name']
-                                                .toString(),
+                                            Helper.tranSalate(
+                                              key: listModule[index]['name']
+                                                  .toString(),
+                                            ),
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               fontSize: 16,
