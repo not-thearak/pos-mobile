@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:online_pos/Repository/api_repo.dart';
+import 'package:online_pos/pages/Sale/order_page.dart';
 
 class SalePage extends StatefulWidget {
   SalePage({super.key});
@@ -10,6 +11,11 @@ class SalePage extends StatefulWidget {
 
 class _SalePageState extends State<SalePage> {
   int selectedCategoryIndex = 0;
+
+  Future<bool> addToHold({required Map<String, dynamic> body}) async {
+    bool isSuccess = await ApiRepo.holdInsert(body: body);
+    return isSuccess;
+  }
 
   void getAllProduct({required int categoryId}) async {
     ApiRepo.getProduct(categoryId: categoryId).then((value) {
@@ -25,17 +31,6 @@ class _SalePageState extends State<SalePage> {
       setState(() {});
     });
   }
-
-  // Sample categories
-  // final List<String> categories = [
-  //   'All',
-  //   'Electronics',
-  //   'Clothing',
-  //   'Food',
-  //   'Books',
-  //   'Home',
-  //   'Sports',
-  // ];
 
   // Sample products
   List<Map<String, dynamic>> allProducts = [];
@@ -69,9 +64,26 @@ class _SalePageState extends State<SalePage> {
         actions: [
           Stack(
             children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Icon(Icons.shopping_cart, color: Colors.white, size: 28),
+              GestureDetector(
+                onTap: () {
+                  // Handle cart tap
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return OrderPage();
+                      },
+                    ),
+                  );
+                },
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Icon(
+                    Icons.shopping_cart,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
               ),
               Positioned(
                 right: 12,
@@ -111,15 +123,13 @@ class _SalePageState extends State<SalePage> {
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: GestureDetector(
                       onTap: () {
-                        for(var item in allCategory){
+                        for (var item in allCategory) {
                           item['is_selected'] = 0;
                         }
                         allCategory[index]['is_selected'] = 1;
                         int categoryId = allCategory[index]['id'];
-                         getAllProduct(categoryId: categoryId);
-                        setState(() {
-                          
-                        });
+                        getAllProduct(categoryId: categoryId);
+                        setState(() {});
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(
@@ -130,7 +140,7 @@ class _SalePageState extends State<SalePage> {
                           color: allCategory[index]['is_selected'] == 1
                               ? Color(0xFF667eea)
                               : Colors.white,
-                      
+
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: Color(0xFF667eea).withOpacity(0.3),
@@ -228,7 +238,7 @@ class _SalePageState extends State<SalePage> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    product['category'] ?? '',
+                                    product['category_name'].toString() ?? '',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: Color(0xFF667eea),
@@ -282,8 +292,34 @@ class _SalePageState extends State<SalePage> {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () {
-                                  print("+ qty");
+                                onTap: () async {
+                                  // print("Insert to hold --> ${product}");
+                                  bool status = await addToHold(
+                                    body: {
+                                      "name": product["name"],
+                                      "price": product["price"],
+                                      "currency": product["currency"],
+                                    },
+                                  );
+                                  if (status) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        backgroundColor: Colors.green,
+                                        content: Text(
+                                          "Product added to hold successfully",
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        backgroundColor: Colors.red,
+                                        content: Text(
+                                          "Failed to add product to hold!",
+                                        ),
+                                      ),
+                                    );
+                                  }
                                 },
                                 child: Container(
                                   width: 28,

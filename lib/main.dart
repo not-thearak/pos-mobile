@@ -9,7 +9,9 @@ import 'package:online_pos/Pages/splash_screen.dart';
 import 'package:online_pos/Storage/local_str.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    
+    const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -21,7 +23,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-
+ 
   bool isLoading=false;
   String? result="";
   void checkStorage()async{
@@ -47,7 +49,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home:isLoading==true?SizedBox(): result !=null?HomePage(): LoginPage());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home:isLoading==true?SizedBox(): result !=null?HomePage(): LoginPage()
+      );
     // return MaterialApp(home: HomePage(),);
   }
 }
