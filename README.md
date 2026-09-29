@@ -74,7 +74,8 @@ Flutter Mobile Application
 
 ### 🔐 Login
 
-![Login Screen](screenshots/login.png)
+<img width="400" height="337" alt="image" src="https://github.com/user-attachments/assets/1b72fa75-05ba-4b27-9496-a931e0a7ee43" />
+
 
 ### 🏠 Home
 
