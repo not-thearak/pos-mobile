@@ -74,16 +74,20 @@ Flutter Mobile Application
 
 ### 🔐 Login
 
-<img width="400" height="337" alt="image" src="https://github.com/user-attachments/assets/1b72fa75-05ba-4b27-9496-a931e0a7ee43" />
+<img width="389" height="865" alt="image" src="https://github.com/user-attachments/assets/4640f8a4-1d95-4669-a75e-eded4f653f75" />
+
 
 
 ### 🏠 Home
 
-![Home Screen](screenshots/home.png)
+<img width="388" height="866" alt="image" src="https://github.com/user-attachments/assets/363fb352-3de8-4c6e-a7fa-2b7d674102f5" />
+
 
 ### 📦 Products
 
-![Products Screen](screenshots/products.png)
+<img width="388" height="864" alt="image" src="https://github.com/user-attachments/assets/014dcad2-dde4-4cb1-8c3a-0b461c9083c6" />
+
+
 
 ### 🛒 Shopping Cart
 
@@ -91,7 +95,8 @@ Flutter Mobile Application
 
 ### 🧾 Sale / Order
 
-![Sale Screen](screenshots/sale.png)
+<img width="393" height="865" alt="image" src="https://github.com/user-attachments/assets/50a6b79e-8102-4a9d-b15c-0b65b1c0ce16" />
+
 
 ---
 
