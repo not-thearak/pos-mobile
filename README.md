@@ -38,8 +38,6 @@ Flutter Mobile Application
 * 🧾 Order / Sale Management
 * 🔗 REST API Integration
 * 💾 Local Storage
-* 🌐 Multi-language Support
-* 📱 Responsive Mobile UI
 
 ---
 
