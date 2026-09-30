@@ -130,11 +130,11 @@ online_pos/
 ├── android/
 ├── ios/
 ├── lib/
+│   ├── Elements/
+│   ├── Helper/
 │   ├── pages/
-│   ├── widgets/
-│   ├── models/
-│   ├── services/
 │   ├── repositories/
+│   ├── Storage/
 │   └── main.dart
 │
 ├── assets/
